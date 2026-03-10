@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { connection } from "./database";
 import userRoutes from "./routes/userRoutes";
-import productRoutes from "./routes/productRoutes";
+import ProdutoRoutes from "./routes/ProdutoRoutes";
 
 dotenv.config();
 
@@ -12,7 +12,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/users", userRoutes);
-app.use("/products", productRoutes);
+app.use("/produtos", ProdutoRoutes);
 
 app.get("/", (req, res) => {
   return res.status(200).json({ message: "API funcionando 🚀" });
