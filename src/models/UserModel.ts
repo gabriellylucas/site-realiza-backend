@@ -1,4 +1,4 @@
-import { connection } from "../database";
+import { connection } from "../services/database";
 
 export class UserModel {
 

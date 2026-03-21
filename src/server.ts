@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { connection } from "./database";
+import { connection } from "./services/database";
 import userRoutes from "./routes/userRoutes";
 import ProdutoRoutes from "./routes/ProdutoRoutes";
 
