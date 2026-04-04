@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { connection } from "./services/database";
 import userRoutes from "./routes/userRoutes";
 import ProdutoRoutes from "./routes/ProdutoRoutes";
+import orcamentosRoutes from "./orcamento";
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/users", userRoutes);
 app.use("/produtos", ProdutoRoutes);
+app.use("/orcamentos", orcamentosRoutes);
 
 app.get("/", (req, res) => {
   return res.status(200).json({ message: "API funcionando 🚀" });
