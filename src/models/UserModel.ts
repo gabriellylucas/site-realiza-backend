@@ -25,6 +25,20 @@ export class UserModel {
     return rows;
   }
 
+  static async findAllWithPagination(limit: number, offset: number) {
+    const countSql = `SELECT COUNT(*) as total FROM users`;
+    const [countRows]: any = await connection.execute(countSql);
+    const total = countRows[0].total;
+
+    const sql = `SELECT id, nome, email, cpf, created_at FROM users LIMIT ? OFFSET ?`;
+    const [rows] = await connection.execute(sql, [limit, offset]);
+
+    return {
+      usuarios: rows,
+      total
+    };
+  }
+
   static async updateWithoutEmail(id: number, nome: string, senha: string, cpf: string) {
     const query = `
       UPDATE users

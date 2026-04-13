@@ -103,6 +103,29 @@ export class UserController {
     }
   }
 
+  static async list(req: Request, res: Response) {
+    try {
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 10;
+      const offset = (page - 1) * limit;
+
+      const { usuarios, total } = await UserModel.findAllWithPagination(limit, offset);
+
+      return res.status(200).json({
+        usuarios,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit)
+        }
+      });
+
+    } catch (error) {
+      return res.status(500).json({ message: "Erro ao buscar usuários" });
+    }
+  }
+
   static async update(req: Request, res: Response) {
     try {
       const userId = (req as any).userId;
