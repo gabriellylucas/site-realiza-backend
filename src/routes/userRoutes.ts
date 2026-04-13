@@ -12,6 +12,6 @@ router.get("/perfil", authMiddleware, (req, res) => {
   return res.status(200).json({ message: "Você acessou uma rota protegida 🔐" });
 });
 
-router.put("/update", authMiddleware, UserController.update);
+router.put("/update/:id", authMiddleware, UserController.update);
 
 export default router;

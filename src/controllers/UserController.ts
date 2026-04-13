@@ -52,7 +52,7 @@ export class UserController {
       const senhaForte = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(senha);
       if (!senhaForte) {
         return res.status(400).json({
-          message: "Senha deve ter letras e números"
+          message: "Senha deve ter letras e números, mínimo 6 caracteres"
         });
       }
 
@@ -105,7 +105,52 @@ export class UserController {
 
   static async update(req: Request, res: Response) {
     try {
-      return res.status(200).json({ message: "Usuário atualizado" });
+      const userId = (req as any).userId;
+      const { id } = req.params;
+
+      if (Number(id) !== userId) {
+        return res.status(403).json({
+          message: "Você só pode editar seu próprio usuário"
+        });
+      }
+
+      const userAtual: any = await UserModel.findById(Number(id));
+
+      if (!userAtual || userAtual.length === 0) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      const { nome, senha, cpf } = req.body;
+
+      if (!nome || !senha || !cpf) {
+        return res.status(400).json({
+          message: "Todos os campos são obrigatórios: nome, senha, CPF"
+        });
+      }
+
+      if (req.body.email && req.body.email !== userAtual[0].email) {
+        return res.status(400).json({
+          message: "Não é permitido alterar o email"
+        });
+      }
+
+      if (!validarCPF(cpf)) {
+        return res.status(400).json({ message: "CPF inválido" });
+      }
+
+      const senhaForte = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(senha);
+      if (!senhaForte) {
+        return res.status(400).json({
+          message: "Senha deve ter letras e números, mínimo 6 caracteres"
+        });
+      }
+
+      const hashedPassword = await bcrypt.hash(senha, 10);
+
+      await UserModel.updateWithoutEmail(Number(id), nome, hashedPassword, cpf);
+
+      return res.status(200).json({ message: "Usuário atualizado com sucesso" });
+
     } catch (error) {
       return res.status(500).json({ message: "Erro ao atualizar usuário" });
     }

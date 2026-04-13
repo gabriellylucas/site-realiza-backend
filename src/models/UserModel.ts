@@ -19,4 +19,19 @@ export class UserModel {
     return rows;
   }
 
+  static async findById(id: number) {
+    const query = `SELECT * FROM users WHERE id = ?`;
+    const [rows] = await connection.execute(query, [id]);
+    return rows;
+  }
+
+  static async updateWithoutEmail(id: number, nome: string, senha: string, cpf: string) {
+    const query = `
+      UPDATE users
+      SET nome = ?, senha = ?, cpf = ?
+      WHERE id = ?
+    `;
+
+    await connection.execute(query, [nome, senha, cpf, id]);
+  }
 }
