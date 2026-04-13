@@ -2,14 +2,11 @@ import { Router } from "express";
 
 const router = Router();
 
-// 🔥 banco fake (por enquanto)
 let orcamentos: any[] = [];
 
-// ✅ CRIAR orçamento (CREATE)
 router.post("/", (req, res) => {
   const { empresa, cnpj, local, equipamentos } = req.body;
 
-  // 🔐 Validação básica
   if (!empresa || !cnpj || !equipamentos || equipamentos.length === 0) {
     return res.status(400).json({
       erro: "Campos obrigatórios faltando ou equipamentos vazio"
@@ -18,24 +15,21 @@ router.post("/", (req, res) => {
 
   let totalKg = 0;
 
-  // 🧠 cálculo automático baseado no modelo real
   equipamentos.forEach((item: any) => {
     const { tipo, litragem, quantidade } = item;
 
     if (!tipo || !quantidade) return;
 
     if (tipo === "KIT") {
-      // cada kit = 80kg
+
       totalKg += quantidade * 80;
     } else {
       if (!litragem) return;
 
-      // 0,50 g/L → convertido para kg
       totalKg += (litragem * 0.5 * quantidade) / 1000;
     }
   });
 
-  // 💰 valor baseado no modelo
   const investimentoTotal = totalKg * 3960;
 
   const novoOrcamento = {
@@ -57,12 +51,10 @@ router.post("/", (req, res) => {
   res.status(201).json(novoOrcamento);
 });
 
-// ✅ LISTAR todos os orçamentos (READ)
 router.get("/", (req, res) => {
   res.json(orcamentos);
 });
 
-// ✅ BUSCAR por ID
 router.get("/:id", (req, res) => {
   const orcamento = orcamentos.find(o => o.id === req.params.id);
 
@@ -73,7 +65,6 @@ router.get("/:id", (req, res) => {
   res.json(orcamento);
 });
 
-// ✅ ATUALIZAR status (ex: admin)
 router.put("/:id/status", (req, res) => {
   const { status } = req.body;
 
@@ -88,7 +79,6 @@ router.put("/:id/status", (req, res) => {
   res.json(orcamento);
 });
 
-// ✅ DELETAR orçamento
 router.delete("/:id", (req, res) => {
   const index = orcamentos.findIndex(o => o.id === req.params.id);
 

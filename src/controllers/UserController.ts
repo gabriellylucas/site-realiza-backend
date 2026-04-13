@@ -3,6 +3,33 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { UserModel } from "../models/UserModel";
 
+function validarCPF(cpf: string): boolean {
+  cpf = cpf.replace(/\D/g, "");
+
+  if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+
+  let soma = 0;
+  let resto;
+
+  for (let i = 1; i <= 9; i++) {
+    soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+  }
+
+  resto = (soma * 10) % 11;
+  if (resto === 10 || resto === 11) resto = 0;
+  if (resto !== parseInt(cpf.substring(9, 10))) return false;
+
+  soma = 0;
+  for (let i = 1; i <= 10; i++) {
+    soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+  }
+
+  resto = (soma * 10) % 11;
+  if (resto === 10 || resto === 11) resto = 0;
+
+  return resto === parseInt(cpf.substring(10, 11));
+}
+
 export class UserController {
 
   static async register(req: Request, res: Response) {
@@ -11,6 +38,22 @@ export class UserController {
 
       if (!nome || !email || !senha || !cpf) {
         return res.status(400).json({ message: "Todos os campos são obrigatórios" });
+      }
+
+      const emailValido = /\S+@\S+\.\S+/.test(email);
+      if (!emailValido) {
+        return res.status(400).json({ message: "Email inválido" });
+      }
+
+      if (!validarCPF(cpf)) {
+        return res.status(400).json({ message: "CPF inválido" });
+      }
+
+      const senhaForte = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/.test(senha);
+      if (!senhaForte) {
+        return res.status(400).json({
+          message: "Senha deve ter letras e números"
+        });
       }
 
       const hashedPassword = await bcrypt.hash(senha, 10);
@@ -60,4 +103,11 @@ export class UserController {
     }
   }
 
+  static async update(req: Request, res: Response) {
+    try {
+      return res.status(200).json({ message: "Usuário atualizado" });
+    } catch (error) {
+      return res.status(500).json({ message: "Erro ao atualizar usuário" });
+    }
+  }
 }
