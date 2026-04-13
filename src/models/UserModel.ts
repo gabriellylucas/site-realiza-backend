@@ -34,4 +34,9 @@ export class UserModel {
 
     await connection.execute(query, [nome, senha, cpf, id]);
   }
+
+  static async delete(id: number) {
+    const query = `DELETE FROM users WHERE id = ?`;
+    await connection.execute(query, [id]);
+  }
 }

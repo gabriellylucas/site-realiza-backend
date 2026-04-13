@@ -155,4 +155,30 @@ export class UserController {
       return res.status(500).json({ message: "Erro ao atualizar usuário" });
     }
   }
+
+  static async delete(req: Request, res: Response) {
+    try {
+      const userId = (req as any).userId;
+      const { id } = req.params;
+
+      if (Number(id) !== userId) {
+        return res.status(403).json({
+          message: "Você só pode deletar seu próprio usuário"
+        });
+      }
+
+      const userAtual: any = await UserModel.findById(Number(id));
+
+      if (!userAtual || userAtual.length === 0) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      await UserModel.delete(Number(id));
+
+      return res.status(200).json({ message: "Usuário deletado com sucesso" });
+
+    } catch (error) {
+      return res.status(500).json({ message: "Erro ao deletar usuário" });
+    }
+  }
 }
