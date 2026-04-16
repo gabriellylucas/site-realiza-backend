@@ -1,12 +1,13 @@
 import { Router } from "express";
 import { ContatoController } from "../controllers/ContatoController";
+import { authMiddleware } from "../middlewares/authMiddleware";
 
 const router = Router();
 
-router.post("/", ContatoController.create);
-router.get("/", ContatoController.list);
-router.put("/:id", ContatoController.update);
-router.delete("/:id", ContatoController.delete);
-router.get("/:id", ContatoController.getById);
+router.post("/", authMiddleware, ContatoController.create);
+router.get("/", authMiddleware, ContatoController.list);
+router.put("/:id", authMiddleware, ContatoController.update);
+router.delete("/:id", authMiddleware, ContatoController.delete);
+router.get("/:id", authMiddleware, ContatoController.getById);
 
 export default router;

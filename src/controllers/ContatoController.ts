@@ -52,6 +52,13 @@ export class ContatoController {
         return res.status(400).json({ message: "Todos os campos são obrigatórios" });
       }
 
+      // ✔ VERIFICAÇÃO ADICIONADA
+      const contato = await ContatoModel.findById(Number(id));
+
+      if (!contato) {
+        return res.status(404).json({ message: "Contato não encontrado" });
+      }
+
       await ContatoModel.update(Number(id), nome, email, mensagem);
 
       return res.status(200).json({ message: "Mensagem atualizada com sucesso" });
@@ -65,6 +72,13 @@ export class ContatoController {
     try {
       const { id } = req.params;
 
+      // ✔ VERIFICAÇÃO ADICIONADA
+      const contato = await ContatoModel.findById(Number(id));
+
+      if (!contato) {
+        return res.status(404).json({ message: "Contato não encontrado" });
+      }
+
       await ContatoModel.delete(Number(id));
 
       return res.status(200).json({ message: "Mensagem deletada com sucesso" });
@@ -75,20 +89,19 @@ export class ContatoController {
   }
 
   static async getById(req: Request, res: Response) {
-  try {
-    const { id } = req.params;
+    try {
+      const { id } = req.params;
 
-    const contato = await ContatoModel.findById(Number(id));
+      const contato = await ContatoModel.findById(Number(id));
 
-    if (!contato) {
-      return res.status(404).json({ message: "Contato não encontrado" });
+      if (!contato) {
+        return res.status(404).json({ message: "Contato não encontrado" });
+      }
+
+      return res.status(200).json(contato);
+
+    } catch (error) {
+      return res.status(500).json({ message: "Erro ao buscar contato" });
     }
-
-    return res.status(200).json(contato);
-
-  } catch (error) {
-    return res.status(500).json({ message: "Erro ao buscar contato" });
   }
-}
-
 }
