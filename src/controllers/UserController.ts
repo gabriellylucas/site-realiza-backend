@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { UserModel } from "../models/UserModel";
+import { OrcamentoModel } from "../models/OrcamentoModel"; // 👈 IMPORTANTE
 
 function validarCPF(cpf: string): boolean {
   cpf = cpf.replace(/\D/g, "");
@@ -96,6 +97,12 @@ export class UserController {
       return res.status(200).json({
         message: "Login realizado com sucesso",
         token,
+        user: {
+          id: user[0].id,
+          nome: user[0].nome,
+          email: user[0].email,
+          cpf: user[0].cpf,
+        }
       });
 
     } catch (error) {
@@ -194,6 +201,15 @@ export class UserController {
 
       if (!userAtual || userAtual.length === 0) {
         return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      // 🔥 NOVO: verificar se tem orçamento
+      const temOrcamento = await OrcamentoModel.existePorUserId(userId);
+
+      if (temOrcamento) {
+        return res.status(400).json({
+          message: "Você possui orçamento(s) cadastrado(s). Exclua-os antes de excluir sua conta."
+        });
       }
 
       await UserModel.delete(Number(id));

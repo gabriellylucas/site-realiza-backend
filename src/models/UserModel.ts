@@ -1,7 +1,6 @@
 import { connection } from "../services/database";
 
 export class UserModel {
-
   static async create(nome: string, email: string, senha: string, cpf: string) {
     const query = `
       INSERT INTO users (nome, email, senha, cpf)
@@ -9,7 +8,6 @@ export class UserModel {
     `;
 
     const [result] = await connection.execute(query, [nome, email, senha, cpf]);
-
     return result;
   }
 
@@ -30,7 +28,11 @@ export class UserModel {
     const [countRows]: any = await connection.execute(countSql);
     const total = countRows[0].total;
 
-    const sql = `SELECT id, nome, email, cpf, created_at FROM users LIMIT ? OFFSET ?`;
+    const sql = `
+      SELECT id, nome, email, cpf, created_at
+      FROM users
+      LIMIT ? OFFSET ?
+    `;
     const [rows] = await connection.execute(sql, [limit, offset]);
 
     return {
