@@ -11,14 +11,23 @@ export class ContatoModel {
     return result;
   }
 
-  static async findAll() {
+  static async findAllWithPagination(limit: number, offset: number) {
+    const countQuery = `SELECT COUNT(*) as total FROM contatos`;
+    const [countRows]: any = await connection.execute(countQuery);
+    const total = countRows[0].total;
+
     const query = `
       SELECT * FROM contatos
       ORDER BY created_at DESC
+      LIMIT ? OFFSET ?
     `;
 
-    const [rows] = await connection.execute(query);
-    return rows;
+    const [rows] = await connection.execute(query, [limit, offset]);
+
+    return {
+      contatos: rows,
+      total
+    };
   }
 
   static async findById(id: number) {

@@ -22,9 +22,21 @@ export class ContatoController {
 
   static async list(req: Request, res: Response) {
     try {
-      const contatos = await ContatoModel.findAll();
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 5;
+      const offset = (page - 1) * limit;
 
-      return res.status(200).json(contatos);
+      const { contatos, total } = await ContatoModel.findAllWithPagination(limit, offset);
+
+      return res.status(200).json({
+        contatos,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit)
+        }
+      });
 
     } catch (error) {
       return res.status(500).json({ message: "Erro ao buscar mensagens" });
@@ -61,4 +73,22 @@ export class ContatoController {
       return res.status(500).json({ message: "Erro ao deletar mensagem" });
     }
   }
+
+  static async getById(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+
+    const contato = await ContatoModel.findById(Number(id));
+
+    if (!contato) {
+      return res.status(404).json({ message: "Contato não encontrado" });
+    }
+
+    return res.status(200).json(contato);
+
+  } catch (error) {
+    return res.status(500).json({ message: "Erro ao buscar contato" });
+  }
+}
+
 }
